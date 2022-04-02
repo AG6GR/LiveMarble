@@ -43,15 +43,15 @@
 
 		// Technically rotate y, since threejs uses y as vertical axis
 		mat3 rotate_z(float angle) {
-			return mat3(cos(angle), 0, -sin(angle),
+			return mat3(cos(angle), 0, sin(angle),
 						0, 1, 0,
-						sin(angle), 0, cos(angle));
+						-sin(angle), 0, cos(angle));
 		}
 
 		vec4 full_disk_sample(SatData satellite) {
 			vec3 normal_rotated = rotate_z(satellite.longitude) * vNormal;
-			float norm_height = H_r_pol - normal_rotated.x;
-			vec2 uv = vec2(atan(normal_rotated.z / norm_height),
+			float norm_height = H_r_pol - normal_rotated.z;
+			vec2 uv = vec2(atan(normal_rotated.x / norm_height),
 							atan(normal_rotated.y / norm_height));
 
 			uv = uv / satellite.fov + 0.5;
@@ -60,7 +60,7 @@
 
 			// Store cos(nadir angle) in the alpha channel
 			// with remaped range from 0.2-1.0 to 0.0-1.0
-			color *= (clamp(normal_rotated.x, 0.2, 1.0) - 0.2) * 1.25;
+			color *= (clamp(normal_rotated.z, 0.2, 1.0) - 0.2) * 1.25;
 			return color;
 		}
 
