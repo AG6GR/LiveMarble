@@ -112,12 +112,14 @@
 			const loader = new THREE.TextureLoader();
 			loader.load(url, 
 				function ( texture ) {
+					console.log("Loaded: " + texture)
 					material.uniforms.satellites.value.push({
 						fov : fov,
 						longitude : longitude * Math.PI / 180,
 						disk_texture : texture
 					})
 					material.uniforms.num_satellites.value += 1;
+					console.log(material.uniforms.num_satellites.value)
 				},
 				undefined,
 				function ( err ) {
@@ -125,9 +127,9 @@
 				});
 		}
 
-		load_sat_image("img/himawari.jpg", 141, 0.3075);
-		load_sat_image("img/goes17.jpg", -137, 0.303744);
-		load_sat_image("img/goes16.jpg", -75, 0.303744);
+		load_sat_image("https://rammb.cira.colostate.edu/ramsdis/online/images/latest/himawari-8/full_disk_ahi_true_color.jpg", 141, 0.3075);
+		load_sat_image("https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/5424x5424.jpg", -137, 0.303744);
+		load_sat_image("https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/5424x5424.jpg", -75, 0.303744);
 
 		const geometry = new THREE.SphereGeometry(1, 32, 16);
 		const material = new THREE.ShaderMaterial( {
