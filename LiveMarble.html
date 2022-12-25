@@ -41,8 +41,8 @@
 		};
 
 		uniform float H_r_pol;
-		uniform uint num_satellites;
-		uniform SatData satellites[3];
+		uniform uint num_satellites; // Actual number of satellites
+		uniform SatData satellites[3]; // Maximum number of satellites is set to 3, since GLSL requires fixed length arrays in uniforms
 		varying vec3 vNormal;
 
 		// Technically rotate y, since threejs uses y as vertical axis
@@ -129,19 +129,19 @@
 		const material = new THREE.ShaderMaterial( {
 			uniforms: { 
 				H_r_pol : { value : 6.63297 },
-				num_satellites : {value : 3},
+				num_satellites : {value : 2}, // Value set to 2 to disable Himawari due to CORS issue
 				satellites : {
 					value : [
 						// GOES17
 						{
 							fov : 0.303744,
-							longitude : 137 * Math.PI / 180,
+							longitude : -137 * Math.PI / 180,
 							disk_texture : new THREE.TextureLoader().load("https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/5424x5424.jpg")
 						},
 						// GOES16
 						{
 							fov : 0.303744,
-							longitude : 75 * Math.PI / 180,
+							longitude : -75 * Math.PI / 180,
 							disk_texture : new THREE.TextureLoader().load("https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/5424x5424.jpg")
 						},
 						// Himawari
