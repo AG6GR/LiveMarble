@@ -129,15 +129,9 @@
 		const material = new THREE.ShaderMaterial( {
 			uniforms: { 
 				H_r_pol : { value : 6.63297 },
-				num_satellites : {value : 2},
+				num_satellites : {value : 3},
 				satellites : {
 					value : [
-						// Himawari
-						//{
-						//	fov : 0.3075,
-						//	longitude : 141 * Math.PI / 180,
-						//	disk_texture : new THREE.TextureLoader().load("https://www.data.jma.go.jp/mscweb/data/himawari/img/fd_/fd__trm_0400.jpg")
-						//},
 						// GOES17
 						{
 							fov : 0.303744,
@@ -149,7 +143,13 @@
 							fov : 0.303744,
 							longitude : 75 * Math.PI / 180,
 							disk_texture : new THREE.TextureLoader().load("https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/5424x5424.jpg")
-						}
+						},
+						// Himawari
+						{
+							fov : 0.3075,
+							longitude : 141 * Math.PI / 180,
+							disk_texture : new THREE.TextureLoader().load("https://www.data.jma.go.jp/mscweb/data/himawari/img/fd_/fd__trm_0400.jpg")
+						},
 					]
 				}
 			},
