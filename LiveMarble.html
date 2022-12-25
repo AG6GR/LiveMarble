@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head> 
+	<meta charset="utf-8">
+	<title>LiveMarble</title>
+	<style> 
+		body { 
+			margin: 0;
+		} 
+	</style> 
+</head> 
+<body> 
+	<!--<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>-->
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "./three.module.js"
+			}
+		}
+	</script>
+
+	<script type="x-shader/x-vertex" id="vertexShader">
+		varying vec3 vNormal;
+
+		void main() {
+			vNormal = normal;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentShader">
+		struct SatData {
+			float fov; // Satellite field of view in radians
+			float longitude; // Satellite longitude in radians
+			sampler2D disk_texture;
+		};
+
+		uniform float H_r_pol;
+		uniform uint num_satellites;
+		uniform SatData satellites[3];
+		varying vec3 vNormal;
+
+		// Technically rotate y, since threejs uses y as vertical axis
+		mat3 rotate_z(float angle) {
+			return mat3(cos(angle), 0, -sin(angle),
+						0, 1, 0,
+						sin(angle), 0, cos(angle));
+		}
+
+		vec4 full_disk_sample(SatData satellite) {
+			vec3 normal_rotated = rotate_z(satellite.longitude) * vNormal;
+			float norm_height = H_r_pol - normal_rotated.x;
+			vec2 uv = vec2(atan(normal_rotated.z / norm_height),
+							atan(normal_rotated.y / norm_height));
+
+			uv = uv / satellite.fov + 0.5;
+
+			vec4 color = texture(satellite.disk_texture, uv);
+
+			// Store cos(nadir angle) in the alpha channel
+			// with remaped range from 0.2-1.0 to 0.0-1.0
+			color *= (clamp(normal_rotated.x, 0.2, 1.0) - 0.2) * 1.25;
+			return color;
+		}
+
+		void main() {
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+			for (uint i = 0u; i < num_satellites; i++) {
+				vec4 sat_sample = full_disk_sample(satellites[i]);
+				gl_FragColor = (gl_FragColor.a > sat_sample.a) ? gl_FragColor : sat_sample;
+			}
+			
+			gl_FragColor.a = 1.0;
+		}
+	</script>
+
+	<script type="module"> 
+		"use strict";
+		import * as THREE from './three.module.js';
+
+		import { OrbitControls } from "./OrbitControls.js"
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+		camera.position.z = 5;
+		controls.update();
+
+		const geometry = new THREE.SphereGeometry(1, 32, 16);
+		const material = new THREE.ShaderMaterial( {
+			uniforms: { 
+				H_r_pol : { value : 6.63297 },
+				num_satellites : {value : 3},
+				satellites : {
+					value : [{
+						fov:  0.3075,
+						longitude : 141 * Math.PI / 180,
+						disk_texture : new THREE.TextureLoader().load("img/himawari.jpg" )
+					}, {
+						fov:  0.303744,
+						longitude : -137 * Math.PI / 180,
+						disk_texture : new THREE.TextureLoader().load("img/goes17.jpg" )
+					}, {
+						fov:  0.303744,
+						longitude : -75 * Math.PI / 180,
+						disk_texture : new THREE.TextureLoader().load("img/goes16.jpg" )
+					}]
+				}
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+		} );
+
+		const sphere = new THREE.Mesh( geometry, material );
+		scene.add( sphere );
+
+		const loader = new THREE.TextureLoader()
+		loader.load('img/starmap_2020_3k.png',
+			function (texture) {
+				const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
+				rt.fromEquirectangularTexture(renderer, texture);
+				scene.background = rt.texture;
+			});
+
+		function animate() { requestAnimationFrame( animate );
+			controls.update();
+			renderer.render( scene, camera );
+		};
+		animate();
+	</script>
+</body>
+</html>
