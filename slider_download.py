@@ -52,6 +52,8 @@ class SliderDownloader:
         for name, info in self.products["satellites"].items():
             print(f'{info["satellite_title"]} ({name})')
             if "full_disk" in info["sectors"]:
+                print(f'\tLongitude: {info["sectors"]["full_disk"]["lat_lon_query"]["lon0"]}')
+                print(f'\tAltitude: {info["sectors"]["full_disk"]["lat_lon_query"]["sat_alt"]}')
                 print(f'\tMax zoom level: {info["sectors"]["full_disk"]["max_zoom_level"]}')
                 print(f'\tTile size: {info["sectors"]["full_disk"]["tile_size"]}')
                 print(f'\tMinutes between images: {info["sectors"]["full_disk"]["defaults"]["minutes_between_images"]}')
@@ -145,7 +147,7 @@ if __name__ == "__main__":
         for satellite in satellites:
             if not downloader.is_geostationary(satellite):
                 continue
-            timestamp = downloader.fetch_latest_timestamp(satellite)
+            timestamp = downloader.fetch_latest_timestamp(satellite, align=args.align)
             downloader.download_image(timestamp, satellite, zoomlevel=args.zoom, out_filename=args.out)
     else:
         downloader.print_satellite_info()

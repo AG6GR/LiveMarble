@@ -42,7 +42,7 @@
 
 		uniform float H_r_pol; // H, in units of Earth radii (specifically r_pol)
 		uniform uint num_satellites; // Actual number of valid satellites
-		uniform SatData satellites[3]; // Maximum number of satellites is set to 3, since GLSL requires fixed length arrays in uniforms
+		uniform SatData satellites[5]; // Maximum number of satellites is set to 3, since GLSL requires fixed length arrays in uniforms
 		varying vec3 vNormal;
 
 		// Technically rotate y, since threejs uses y as vertical axis
@@ -64,7 +64,7 @@
 
 			// Store cos(nadir angle) in the alpha channel
 			// with remaped range from 0.2-1.0 to 0.0-1.0
-			color *= (clamp(normal_rotated.z, 0.2, 1.0) - 0.2) * 1.25;
+			color.a *= (clamp(normal_rotated.z, 0.2, 1.0) - 0.2) * 1.25;
 			return color;
 		}
 
@@ -129,26 +129,38 @@
 		const material = new THREE.ShaderMaterial( {
 			uniforms: { 
 				H_r_pol : { value : 6.63297 }, // H / r_pol, see GOES-R user manual vol. 3 Table 5.1.2.8
-				num_satellites : {value : 3},
+				num_satellites : {value : 5},
 				satellites : {
 					value : [
 						// GOES17
 						{
 							fov : 0.303744, // In radians, see GOES-R user manual vol. 3 Table 5.1.2.3-1
 							longitude : -137 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/goes17.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes-17.jpg")
 						},
 						// GOES16
 						{
 							fov : 0.303744,
 							longitude : -75 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/goes16.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes-16.jpg")
 						},
 						// Himawari
 						{
 							fov : 0.3075,
-							longitude : 141 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/himawari_full.jpg")
+							longitude : 140.69 * Math.PI / 180,
+							disk_texture : new THREE.TextureLoader().load("img/himawari.jpg")
+						},
+						// Meteosat-9
+						{
+							fov : 0.3075,
+							longitude : 45.5 * Math.PI / 180,
+							disk_texture : new THREE.TextureLoader().load("img/meteosat-9.jpg")
+						},
+						// Meteosat-11
+						{
+							fov : 0.3075,
+							longitude : -0.084 * Math.PI / 180,
+							disk_texture : new THREE.TextureLoader().load("img/meteosat-11.jpg")
 						},
 					]
 				}
@@ -175,9 +187,8 @@
 		animate();
 	</script>
 	<div style="font-family:'Roboto';width:100%;height:50px;bottom:2%;text-align:center;color:white;position:absolute;">
+		Satellite Imagery: <a href="https://rammb-slider.cira.colostate.edu/" target="_blank">RAMMB/CIRA, Colorado State University</a><br/>
 		Star Map: <a href="https://svs.gsfc.nasa.gov/4851" target="_blank">NASA/Goddard Space Flight Center Scientific Visualization Studio</a><br/>
-		GOES Imagery: <a href="https://www.star.nesdis.noaa.gov/goes/index.php" target="_blank">NOAA STAR Center for Satellite Applications and Research</a><br/>
-		Himawari Imagery: <a href="https://rammb.cira.colostate.edu/ramsdis/online/himawari-8.asp" target="_blank">RAMMB/CIRA, Colorado State University</a><br/>
 	</div>
 </body>
 </html>
