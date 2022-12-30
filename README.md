@@ -42,7 +42,7 @@ $s_z$ can be directly calculated from basic trigonometric relations as $r_c \sin
 
 <center><img src="doc/y_scan_angle_calculation.svg" alt="Y Scan Angle Conversion" width="75%"/></center>
 
-Note that the scan angles are calculated in order elevation (N/S) first, then azimuth (E/W) if you think of them as Euler angles. If we construct point $P'$ by projecting the pointer $P$ onto the $\lambda = \lambda_0$ plane, then the vertical scan angle $y = arctan(s_z / s_x)$. The horizontal scan angle $x$ is defined in terms of the right triangle formed by $P$, $P'$, and the satellite $Sat$. In particular, the length of segment $PP'$ is $s_y$, and the length of the hypotenuse between $P$ and the satellite is $\sqrt{s_x^2 + s_y^2 + s_z^2}$ giving the final expression $x = \arcsin(-s_y / \sqrt{s_x^2 + s_y^2 + s_z^2})$.
+Note that the scan angles are calculated in order elevation (N/S) first, then azimuth (E/W) if you think of them as Euler angles. If we construct point $P'$ by projecting the pointer $P$ onto the $\lambda = \lambda_0$ plane, then the vertical scan angle $y = arctan(s_z / s_x)$. The horizontal scan angle $x$ is defined in terms of the right triangle formed by $P$, $P'$, and the satellite $Sat$. In particular, the length of segment $PP'$ is $s_y$, and the length of the hypotenuse between $P$ and the satellite is $\sqrt{s_x^2 + s_y^2 + s_z^2}$ giving the final expression $x = \arcsin \left(-s_y / \sqrt{s_x^2 + s_y^2 + s_z^2}\right)$.
 
 ## GLSL Implementation
 
