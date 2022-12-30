@@ -129,26 +129,26 @@
 		const material = new THREE.ShaderMaterial( {
 			uniforms: { 
 				H_r_pol : { value : 6.63297 }, // H / r_pol, see GOES-R user manual vol. 3 Table 5.1.2.8
-				num_satellites : {value : 2}, // Value set to 2 to disable Himawari due to CORS issue
+				num_satellites : {value : 3},
 				satellites : {
 					value : [
 						// GOES17
 						{
 							fov : 0.303744, // In radians, see GOES-R user manual vol. 3 Table 5.1.2.3-1
 							longitude : -137 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/5424x5424.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes17.jpg")
 						},
 						// GOES16
 						{
 							fov : 0.303744,
 							longitude : -75 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/5424x5424.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes16.jpg")
 						},
 						// Himawari
 						{
 							fov : 0.3075,
 							longitude : 141 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("https://www.data.jma.go.jp/mscweb/data/himawari/img/fd_/fd__trm_0400.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/himawari_full.jpg")
 						},
 					]
 				}
