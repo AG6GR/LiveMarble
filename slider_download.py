@@ -22,7 +22,7 @@ class SliderDownloader:
             self.products = json.loads(text[text.index('{'):-2])
 
     def fetch_nearest_timestamp(self, satellite, datestr, target_timestr):
-        if not self.is_geostationary(satellite)
+        if not self.is_geostationary(satellite):
             return
 
         with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/{datestr}_by_hour.json") as f:
@@ -50,7 +50,7 @@ class SliderDownloader:
 
     # Max zoomlevel seems to be 4
     def download_image(self, timestamp_str, satellite="goes-16", zoomlevel=3, out_filename=None):
-        if not self.is_geostationary(satellite)
+        if not self.is_geostationary(satellite):
             return
 
         timestamp = datetime.strptime(str(timestamp_str), "%Y%m%d%H%M%S")
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         satellites.append(args.satellite)
 
     for satellite in satellites:
-        if not downloader.is_geostationary(satellite)
+        if not downloader.is_geostationary(satellite):
             continue
         timestamp = downloader.fetch_nearest_timestamp(satellite, args.date, args.time)
         downloader.download_image(timestamp, satellite, zoomlevel=args.zoom)
