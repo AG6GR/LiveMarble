@@ -65,7 +65,7 @@ class SliderDownloader:
         tile_size = self.products["satellites"][satellite]["sectors"]["full_disk"]["tile_size"]
     
         # Clamp zoomlevel to max available
-        zoomlevel = min(zoomlevel, self.products["satellites"][satellite]["sectors"]["full_disk"]["max_zoom_level"] - 1)
+        zoomlevel = min(zoomlevel, self.products["satellites"][satellite]["sectors"]["full_disk"]["max_zoom_level"])
 
         num_tiles = 2 ** zoomlevel
         out_image = np.empty((num_tiles * tile_size, num_tiles * tile_size, 3), dtype=np.uint8)
@@ -101,22 +101,25 @@ class SliderDownloader:
 
 if __name__ == "__main__":
     downloader = SliderDownloader()
-    downloader.print_satellite_info()
 
     import argparse
     parser = argparse.ArgumentParser(description="Download full disk image from RAMMB SLIDER")
     subparsers = parser.add_subparsers(dest="subcommand")
 
     parser_download = subparsers.add_parser('download', help='Download a specific image')
+    parser_download.add_argument('--out', '-o', help="Output file name")
     parser_download.add_argument('--zoom', type=int, default=3, help="Zoom level to use")
     parser_download.add_argument('satellite', choices=downloader.get_satellite_names() + ["all"], help='Name of satellite to download image from')
     parser_download.add_argument('date', help="Date to download in YYYYMMDD format")
     parser_download.add_argument('time', help="Time in HHMM to download, first available image after this time will be used")
     
     parser_latest = subparsers.add_parser('latest', help='Download latest available image')
+    parser_latest.add_argument('--out', '-o', help="Output file name")
     parser_latest.add_argument('--zoom', type=int, default=3, help="Zoom level to use")
     parser_latest.add_argument('--align', type=int, default=30, help="Choose times aligned with given number of minutes")
     parser_latest.add_argument('satellite', choices=downloader.get_satellite_names() + ["all"], help='Name of satellite to download image from')
+
+    parser_info = subparsers.add_parser('info', help='Print satellite info')
 
     args = parser.parse_args()
 
@@ -131,7 +134,7 @@ if __name__ == "__main__":
             if not downloader.is_geostationary(satellite):
                 continue
             timestamp = downloader.fetch_nearest_timestamp(satellite, args.date, args.time)
-            downloader.download_image(timestamp, satellite, zoomlevel=args.zoom)
+            downloader.download_image(timestamp, satellite, zoomlevel=args.zoom, out_filename=args.out)
     elif args.subcommand == "latest":
         satellites = []
         if args.satellite == "all":
@@ -143,5 +146,6 @@ if __name__ == "__main__":
             if not downloader.is_geostationary(satellite):
                 continue
             timestamp = downloader.fetch_latest_timestamp(satellite)
-            downloader.download_image(timestamp, satellite, zoomlevel=args.zoom)
-    
+            downloader.download_image(timestamp, satellite, zoomlevel=args.zoom, out_filename=args.out)
+    else:
+        downloader.print_satellite_info()
