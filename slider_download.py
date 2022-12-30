@@ -16,26 +16,40 @@ class SliderDownloader:
             text = f.read().decode('utf-8')
             self.products = json.loads(text[text.index('{'):-2])
 
-    def fetch_latest_timestamp(self, satellite, align=5):
+    def fetch_latest_time_list(self, satellite):
         with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/latest_times.json") as f:
-            timestamps = json.loads(f.read().decode('utf-8'))['timestamps_int']
-            for timestamp in timestamps:
-                if datetime.strptime(str(timestamp), "%Y%m%d%H%M%S").minute % align == 0:
-                    return timestamp
+            return json.loads(f.read().decode('utf-8'))['timestamps_int']
+
+    def fetch_latest_timestamp(self, satellite, align=5):
+        timestamps = self.fetch_latest_time_list(satellite)
+        for timestamp in timestamps:
+            if datetime.strptime(str(timestamp), "%Y%m%d%H%M%S").minute % align == 0:
+                return timestamp
         return None
 
-    def fetch_nearest_timestamp(self, satellite, datestr, target_timestr):
+    def fetch_nearest_timestamp(self, satellite, target_timestr):
         if not self.is_geostationary(satellite):
             return
+        target_dt = datetime.strptime(str(target_timestr), "%Y%m%d%H%M%S")
 
-        with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/{datestr}_by_hour.json") as f:
+        with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/{target_dt:%Y%m%d}_by_hour.json") as f:
             text = f.read().decode('utf-8')
-            timestamps = sorted(json.loads(text)['timestamps_int'][target_timestr[:2]])
-            target_time = int(datestr + target_timestr + "00")
+            timestamps = sorted(json.loads(text)['timestamps_int'][f"{target_dt:%H}"])
+            target_time = int(target_timestr[:-2] + "00")
             if target_time in timestamps:
                 return target_time
             else:
                 return timestamps[bisect.bisect_right(timestamps, target_time)]
+
+    # Find the latest timestamp (without seconds) that all of the given satellites have imagery available
+    def get_matching_timestamp(self, satellites):
+        matching_timestamps = set()
+        for satellite in satellites:
+            if len(matching_timestamps) == 0:
+                matching_timestamps.update([str(x)[:-2] for x in self.fetch_latest_time_list(satellite)])
+            else:
+                matching_timestamps.intersection_update([str(x)[:-2] for x in self.fetch_latest_time_list(satellite)])
+        return sorted(matching_timestamps)[-1] + "00"
 
     def get_satellite_names(self):
         return list(self.products["satellites"].keys())
@@ -107,8 +121,7 @@ if __name__ == "__main__":
     parser_download.add_argument('--out', '-o', help="Output file name")
     parser_download.add_argument('--zoom', type=int, default=3, help="Zoom level to use")
     parser_download.add_argument('satellite', choices=downloader.get_satellite_names() + ["all"], help='Name of satellite to download image from')
-    parser_download.add_argument('date', help="Date to download in YYYYMMDD format")
-    parser_download.add_argument('time', help="Time in HHMM to download, first available image after this time will be used")
+    parser_download.add_argument('timestamp', help="Time in YYYYMMDDHHMM to download, first available image after this time will be used")
     
     parser_latest = subparsers.add_parser('latest', help='Download latest available image')
     parser_latest.add_argument('--out', '-o', help="Output file name")
@@ -130,7 +143,7 @@ if __name__ == "__main__":
         for satellite in satellites:
             if not downloader.is_geostationary(satellite):
                 continue
-            timestamp = downloader.fetch_nearest_timestamp(satellite, args.date, args.time)
+            timestamp = downloader.fetch_nearest_timestamp(satellite, args.timestamp)
             downloader.download_image(timestamp, satellite, zoomlevel=args.zoom, out_filename=args.out)
     elif args.subcommand == "latest":
         satellites = []

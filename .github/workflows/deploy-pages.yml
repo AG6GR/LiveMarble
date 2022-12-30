@@ -42,7 +42,7 @@ jobs:
       - name: Build Content
         run: |
           mkdir output
-          ./download_imagery.sh
+          ./download_imagery.py
           mv img output
           cp *.html output
           cp *.js output
