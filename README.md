@@ -1,8 +1,6 @@
 # LiveMarble
 
-[Live Imagery, GOES only](https://ag6gr.github.io/LiveMarble/LiveMarble.html)
-
-[Static Imagery, full globe](https://ag6gr.github.io/LiveMarble/LiveMarbleOffline.html)
+<center><a href="https://ag6gr.github.io/LiveMarble/LiveMarble.html" target="_blank"><img src="doc/screenshot.jpg" alt="Click for live page" width="75%"/><br/>Click for live page!</a> </center>
 
 This project aims to provide a real-time view of the globe using satellite imagery. While there are many excellent viewers for both satellite imagery, there's a surprising lack of a way to easily display live data in a 3D globe visualization.
 
