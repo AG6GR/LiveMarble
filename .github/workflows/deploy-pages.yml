@@ -39,6 +39,7 @@ jobs:
         run: |
           mkdir output
           cp *.html output
+          cp *.js output
           ./download_imagery.sh
           mv img output
       - name: Upload artifact
