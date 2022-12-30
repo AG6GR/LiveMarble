@@ -7,11 +7,6 @@ import json
 import bisect
 import concurrent.futures
 
-#https://rammb-slider.cira.colostate.edu/data/json/goes-17/full_disk/geocolor/20221229_by_hour.json
-#https://rammb-slider.cira.colostate.edu/data/json/goes-17/full_disk/geocolor/available_dates.json
-#https://rammb-slider.cira.colostate.edu/data/json/goes-17/full_disk/geocolor/latest_times.json
-#https://rammb-slider.cira.colostate.edu/data/imagery/2022/12/30/goes-16---full_disk/geocolor/20221230045020/04/008_004.png
-
 class SliderDownloader:
     def __init__(self):
         self.fetch_products()

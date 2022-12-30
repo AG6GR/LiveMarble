@@ -42,10 +42,10 @@ jobs:
       - name: Build Content
         run: |
           mkdir output
-          cp *.html output
-          cp *.js output
           ./download_imagery.sh
           mv img output
+          cp *.html output
+          cp *.js output
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
