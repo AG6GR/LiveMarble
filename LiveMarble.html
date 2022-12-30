@@ -141,31 +141,31 @@
 						{
 							fov : 0.303744, // In radians, see GOES-R user manual vol. 3 Table 5.1.2.3-1
 							longitude : -137 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/goes-17.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes-17.jpg", requestRenderIfNotRequested, undefined, undefined)
 						},
 						// GOES16
 						{
 							fov : 0.303744,
 							longitude : -75 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/goes-16.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/goes-16.jpg", requestRenderIfNotRequested, undefined, undefined)
 						},
 						// Himawari
 						{
 							fov : 0.3075,
 							longitude : 140.69 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/himawari.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/himawari.jpg", requestRenderIfNotRequested, undefined, undefined)
 						},
 						// Meteosat-9
 						{
 							fov : 0.3075,
 							longitude : 45.5 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/meteosat-9.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/meteosat-9.jpg", requestRenderIfNotRequested, undefined, undefined)
 						},
 						// Meteosat-11
 						{
 							fov : 0.3075,
 							longitude : -0.084 * Math.PI / 180,
-							disk_texture : new THREE.TextureLoader().load("img/meteosat-11.jpg")
+							disk_texture : new THREE.TextureLoader().load("img/meteosat-11.jpg", requestRenderIfNotRequested, undefined, undefined)
 						},
 					]
 				}
@@ -191,7 +191,7 @@
 			controls.update();
 			renderer.render( scene, camera );
 		};
-		animate();
+		requestAnimationFrame(animate);
 
 		function requestRenderIfNotRequested() {
 			if (!renderRequested) {
