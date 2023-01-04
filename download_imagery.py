@@ -18,6 +18,7 @@ Path("img").mkdir(exist_ok=True)
 
 downloader = SliderDownloader()
 timestamp = downloader.get_matching_timestamp(['goes-16', 'goes-17', 'himawari'])
+print("Aligned timestamp:", timestamp)
 
 for satellite, zoomlevel in satellites.items():
     print(satellite)
