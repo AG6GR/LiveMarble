@@ -39,7 +39,11 @@ class SliderDownloader:
             if target_time in timestamps:
                 return target_time
             else:
-                return timestamps[bisect.bisect_right(timestamps, target_time)]
+                index = bisect.bisect_right(timestamps, target_time)
+                if index == len(timestamps):
+                    return timestamps[-1]
+                else:
+                    return timestamps[index]
 
     # Find the latest timestamp (without seconds) that all of the given satellites have imagery available
     def get_matching_timestamp(self, satellites):
@@ -66,6 +70,8 @@ class SliderDownloader:
                 print(f'\tMax zoom level: {info["sectors"]["full_disk"]["max_zoom_level"]}')
                 print(f'\tTile size: {info["sectors"]["full_disk"]["tile_size"]}')
                 print(f'\tMinutes between images: {info["sectors"]["full_disk"]["defaults"]["minutes_between_images"]}')
+                latest_timestamp = self.fetch_latest_timestamp(name)
+                print(f'\tLatest timestamp available: {latest_timestamp} ({(datetime.utcnow() - datetime.strptime(str(latest_timestamp), "%Y%m%d%H%M%S")).total_seconds() / 60:.04} minutes ago)')
 
     # Max zoomlevel seems to be 4
     def download_image(self, timestamp_str, satellite="goes-16", zoomlevel=3, out_filename=None):
