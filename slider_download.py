@@ -84,7 +84,7 @@ class SliderDownloader:
         def download_single(entry):
             row = entry[0]
             col = entry[1]
-            url = f"https://rammb-slider.cira.colostate.edu/data/imagery/{timestamp.year}/{timestamp.month}/{timestamp.day}/{satellite}---full_disk/geocolor/{timestamp_str}/{zoomlevel:02}/{row:03}_{col:03}.png"
+            url = f"https://rammb-slider.cira.colostate.edu/data/imagery/{timestamp.year:02}/{timestamp.month:02}/{timestamp.day:02}/{satellite}---full_disk/geocolor/{timestamp_str}/{zoomlevel:02}/{row:03}_{col:03}.png"
             print(url)
             out_image[row * tile_size:(row + 1) * tile_size, col * tile_size:(col + 1) * tile_size, :] = iio.imread(url, mode="RGB")
 
