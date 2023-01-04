@@ -34,7 +34,11 @@ class SliderDownloader:
 
         with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/{target_dt:%Y%m%d}_by_hour.json") as f:
             text = f.read().decode('utf-8')
-            timestamps = sorted(json.loads(text)['timestamps_int'][f"{target_dt:%H}"])
+            timestamps_by_hour = json.loads(text)['timestamps_int']
+            timestamps = []
+            for hour, times in timestamps_by_hour.items():
+                timestamps.extend(times)
+            timestamps.sort()
             target_time = int(target_timestr[:-2] + "00")
             if target_time in timestamps:
                 return target_time
@@ -87,29 +91,25 @@ class SliderDownloader:
         num_tiles = 2 ** zoomlevel
         out_image = np.empty((num_tiles * tile_size, num_tiles * tile_size, 3), dtype=np.uint8)
         
-        def download_single(entry):
-            row = entry[0]
-            col = entry[1]
-            url = f"https://rammb-slider.cira.colostate.edu/data/imagery/{timestamp.year:02}/{timestamp.month:02}/{timestamp.day:02}/{satellite}---full_disk/geocolor/{timestamp_str}/{zoomlevel:02}/{row:03}_{col:03}.png"
-            print(url)
+        def download_single(row, col, url):
             out_image[row * tile_size:(row + 1) * tile_size, col * tile_size:(col + 1) * tile_size, :] = iio.imread(url, mode="RGB")
 
-        entries = []
+        tiles = []
         for row in range(2 ** zoomlevel):
             for col in range(2 ** zoomlevel):
-                entries.append((row, col))
+                tiles.append((row, col, f"https://rammb-slider.cira.colostate.edu/data/imagery/{timestamp.year:02}/{timestamp.month:02}/{timestamp.day:02}/{satellite}---full_disk/geocolor/{timestamp_str}/{zoomlevel:02}/{row:03}_{col:03}.png"))
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             completed = 0
-            future_to_entry = {executor.submit(download_single, entry): entry for entry in entries}
-            for future in concurrent.futures.as_completed(future_to_entry):
-                entry = future_to_entry[future]
+            future_to_url = {executor.submit(download_single, tile[0], tile[1], tile[2]): tile[0] for tile in tiles}
+            for future in concurrent.futures.as_completed(future_to_url):
+                url = future_to_url[future]
                 try:
                     data = future.result()
                 except Exception as exc:
-                    print(f'{entry} generated an exception: {exc}')
+                    print(f'{url} generated an exception: {exc}')
                 else:
                     completed += 1
-                    print(f'{completed}/{len(entries)} ({float(completed) / len(entries) * 100:.04}%) finished')
+                    print(f'{completed}/{len(tiles)} ({float(completed) / len(tiles) * 100:.04}%) finished')
         
         if out_filename is None:
             iio.imwrite(f"{satellite}_{timestamp_str}.jpg", out_image, optimize=True)
