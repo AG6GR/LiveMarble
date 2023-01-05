@@ -8,7 +8,7 @@ from slider_download import SliderDownloader
 # Map of satellites to download and what zoom level to use
 satellites = {
     'goes-16' : 2,
-    'goes-17' : 2,
+    'goes-18' : 2,
     'himawari' : 2,
     'meteosat-9' : 3,
     'meteosat-11' : 3
@@ -17,7 +17,7 @@ satellites = {
 Path("img").mkdir(exist_ok=True)
 
 downloader = SliderDownloader()
-timestamp = downloader.get_matching_timestamp(['goes-16', 'goes-17', 'himawari'])
+timestamp = downloader.get_matching_timestamp(['goes-16', 'goes-18', 'himawari'])
 print("Aligned timestamp:", timestamp)
 
 for satellite, zoomlevel in satellites.items():
