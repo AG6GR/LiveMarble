@@ -21,8 +21,8 @@ timestamp = downloader.get_matching_timestamp(['goes-16', 'goes-18', 'himawari']
 print("Aligned timestamp:", timestamp)
 
 for satellite, zoomlevel in satellites.items():
-    print(satellite)
     sat_timestamp = downloader.fetch_nearest_timestamp(satellite, timestamp)
+    print(satellite, sat_timestamp)
     downloader.download_image(sat_timestamp, satellite, zoomlevel=zoomlevel, out_filename=f"img/{satellite}.jpg")
 
 timestamp_dt = datetime.strptime(str(timestamp), "%Y%m%d%H%M%S")

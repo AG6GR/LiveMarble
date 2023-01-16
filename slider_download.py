@@ -27,10 +27,17 @@ class SliderDownloader:
                 return timestamp
         return None
 
+    def fetch_available_dates(self, satellite):
+        with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/available_dates.json") as f:
+            return sorted(json.loads(f.read().decode('utf-8'))['dates_int'], reverse=True)
+
     def fetch_nearest_timestamp(self, satellite, target_timestr):
         if not self.is_geostationary(satellite):
             return
         target_dt = datetime.strptime(str(target_timestr), "%Y%m%d%H%M%S")
+
+        if f"{target_dt:%Y%m%d}" not in self.fetch_available_dates(satellite):
+            return self.fetch_latest_timestamp(satellite)
 
         with urllib.request.urlopen(f"https://rammb-slider.cira.colostate.edu/data/json/{satellite}/full_disk/geocolor/{target_dt:%Y%m%d}_by_hour.json") as f:
             text = f.read().decode('utf-8')
@@ -51,12 +58,20 @@ class SliderDownloader:
 
     # Find the latest timestamp (without seconds) that all of the given satellites have imagery available
     def get_matching_timestamp(self, satellites):
-        matching_timestamps = set()
+        matching_timestamps = None
         for satellite in satellites:
-            if len(matching_timestamps) == 0:
-                matching_timestamps.update([str(x)[:-2] for x in self.fetch_latest_time_list(satellite)])
+            if matching_timestamps is None:
+                matching_timestamps = set([str(x)[:-2] for x in self.fetch_latest_time_list(satellite)])
             else:
-                matching_timestamps.intersection_update([str(x)[:-2] for x in self.fetch_latest_time_list(satellite)])
+                available_times = [str(x)[:-2] for x in self.fetch_latest_time_list(satellite)]
+                # Skip satellite if no intersections for this day are found
+                if len(matching_timestamps.intersection(available_times)) == 0:
+                    print(f"WARNING: No matching timestamp for satellite {satellite}")
+                    continue
+                matching_timestamps.intersection_update(available_times)
+        if len(matching_timestamps) == 0:
+            return None
+
         return sorted(matching_timestamps)[-1] + "00"
 
     def get_satellite_names(self):
