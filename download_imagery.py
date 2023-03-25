@@ -11,7 +11,7 @@ satellites = {
     'goes-18' : 2,
     'himawari' : 2,
     'meteosat-9' : 3,
-    'meteosat-11' : 3
+    'meteosat-0deg' : 3
 }
 
 Path("img").mkdir(exist_ok=True)
