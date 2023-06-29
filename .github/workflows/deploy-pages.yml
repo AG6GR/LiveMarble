@@ -46,6 +46,7 @@ jobs:
           mv img output
           cp *.html output
           cp *.js output
+          ls -l output
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
